@@ -247,6 +247,7 @@ err_add_hcd:
 
 err_regs:
 	usb_put_hcd(hcd);
+	kfree(omap);
 
 err_mem:
 	kfree(omap);
