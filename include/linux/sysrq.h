@@ -19,6 +19,9 @@
 struct pt_regs;
 struct tty_struct;
 
+/* Enable/disable SYSRQ support by default (0==no, 1==yes). */
+#define SYSRQ_DEFAULT_ENABLE	1
+
 /* Possible values of bitmask for enabling sysrq functions */
 /* 0x0001 is reserved for enable everything */
 #define SYSRQ_ENABLE_LOG	0x0002
