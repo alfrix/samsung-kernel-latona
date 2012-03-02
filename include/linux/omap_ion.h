@@ -49,13 +49,33 @@ int omap_ion_nonsecure_tiler_alloc(struct ion_client *client,
 /* given a handle in the tiler, return a list of tiler pages that back it */
 int omap_tiler_pages(struct ion_client *client, struct ion_handle *handle,
 		     int *n, u32 ** tiler_pages);
+#endif /* __KERNEL__ */
+
+#if defined(CONFIG_ION_OMAP)
+int omap_ion_mem_alloc(struct ion_client *client,
+			struct omap_ion_tiler_alloc_data *data);
+int omap_ion_get_pages(struct ion_client *client, struct ion_handle *handle,
+			int *n, unsigned long *ion_addr,
+			struct omap_ion_tiler_alloc_data *sAllocData);
+#else
+static int omap_ion_mem_alloc(struct ion_client *client,
+			struct omap_ion_tiler_alloc_data *data)
+{
+	return -1;
+}
+int omap_ion_get_pages(struct ion_client *client, struct ion_handle *handle,
+			int *n, unsigned long *ion_addr,
+			struct omap_ion_tiler_alloc_data *sAllocData)
+{
+	return -1;
+}
+#endif
 /* additional heaps used only on omap */
 enum {
 	OMAP_ION_HEAP_TYPE_TILER = ION_HEAP_TYPE_CUSTOM + 1,
 };
-#endif /* __KERNEL__ */
 
-#define OMAP_ION_HEAP_TILER_MASK (1 << ION_HEAP_OMAP_TILER)
+#define OMAP_ION_HEAP_TILER_MASK (1 << OMAP_ION_HEAP_TYPE_TILER)
 
 enum {
 	OMAP_ION_TILER_ALLOC,
