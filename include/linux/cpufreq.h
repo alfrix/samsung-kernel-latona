@@ -446,4 +446,14 @@ extern void cpufreq_debug_printk(unsigned int type, const char *prefix,
 
 #endif /* CONFIG_CPU_FREQ_DEBUG */
 
+/*********************************************************************
+ *                 OVERCLOCK STATS UPDATE HELPER                     *
+ *********************************************************************/
+
+#ifdef CONFIG_SAMSUNG_LATONA_OVERCLOCK_ENABLED
+
+int cpufreq_stats_update_freq_table(struct cpufreq_frequency_table *table, unsigned int cpu);
+
+#endif
+
 #endif /* _LINUX_CPUFREQ_H */
