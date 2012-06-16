@@ -10,6 +10,9 @@ make latona_galaxysl_defconfig
 # Make modules
 nice -n 10 make -j4 modules
 
+# Strip modules
+find -name '*.ko' -exec $CYANOGENMOD/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-strip --strip-unneeded {} \;
+
 # Copy modules
 find -name '*.ko' -exec cp -av {} $CYANOGENMOD/device/samsung/galaxysl/modules/ \;
 
