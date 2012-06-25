@@ -826,6 +826,7 @@ void handle_multi_touch(uint8_t *atmel_msg)
 			else touch_count++;
 		}
 		input_sync(tsp.inputdevice);
+        if(touch_count!=0) trigger_touchkey_led(0); else trigger_touchkey_led(3);
 #if defined(CONFIG_SAMSUNG_KERNEL_DEBUG_USER)
 		if(prev_touch_count != touch_count) {
 			printk(KERN_DEBUG "[TSP] id[%d],x=%d,y=%d,%dpoint(s)\n", id, x, y, touch_count);
