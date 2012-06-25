@@ -57,25 +57,34 @@ static void bl_set_timeout() {
 
 void trigger_touchkey_led(int event)
 {
-	//event: 0-All Lights | 1-Menu Pressed | 2-Back Pressed	| 3- All Key Release
+	//event: 0-All Lights | 1-Menu Pressed | 2-Back Pressed	| 3- Screen/key Release
 	if(bl_timeout!=0)
 	{
-		if((event==3)&&(led_state==0)) return; //Dont lightup if keys already turned off
-
-		if((event==0)||(event==3))
+		switch (event)
 		{
+		    case 0 :
 			gpio_set_value(OMAP_GPIO_LED_EN1, 1);
 			gpio_set_value(OMAP_GPIO_LED_EN2, 1);
-		}else if(event==1){
-			gpio_set_value(OMAP_GPIO_LED_EN1, 0);
+		    break;
+		    case 1 :
+   			gpio_set_value(OMAP_GPIO_LED_EN1, 0);
 			gpio_set_value(OMAP_GPIO_LED_EN2, 1);
-		}else if(event==2){
+		    break;
+		    case 2 :
 			gpio_set_value(OMAP_GPIO_LED_EN1, 1);
 			gpio_set_value(OMAP_GPIO_LED_EN2, 0);
+		    break;
+		    case 3 :
+		    gpio_set_value(OMAP_GPIO_LED_EN1, 1);   //this is here in case of coming from 1
+			gpio_set_value(OMAP_GPIO_LED_EN2, 1);   //this is here in case of coming from 2
+			bl_set_timeout();                       //Start the count at screen/key release
+		    break;
+            default :
+        	printk(KERN_DEBUG "[LED] WARNING unknown event: %d  \n", event);
+        	return;
 		}
 		led_state = 1;
 		bln_state = 0;
-		bl_set_timeout();
 	}
 }
 
