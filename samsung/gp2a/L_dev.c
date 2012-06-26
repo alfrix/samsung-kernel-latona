@@ -21,7 +21,8 @@
 #include "main.h"
 #include "L_dev.h"
 #include "common.h"
-
+// This is for touchkey led control
+#include <linux/leds.h>
 /*Light sensor device state, LDO state*/
 #define  NOT_OPERATIONAL    0
 #define  OPERATIONAL        1
@@ -748,7 +749,15 @@ static void L_dev_work_func (struct work_struct *unused)
                     input_sync(L_dev.inputdevice);
                     //L_dev.last_lux_val = lux;
                     L_dev.last_brightness_step = step;
-		     printk(KERN_DEBUG "LSENSOR: %s: adc_val=%d lux = %d \n", __func__, adc_val, lux);			
+		     printk(KERN_DEBUG "LSENSOR: %s: adc_val=%d lux = %d \n", __func__, adc_val, lux);
+		     	 if(lux>=200) {
+				 trigger_touchkey_led(4);
+				 printk(KERN_DEBUG "LSENSOR: Turn the leds OFF lux = %d \n", lux);
+				 }
+				 else {
+				 trigger_touchkey_led(5);
+				 printk(KERN_DEBUG "LSENSOR: Release the leds lux = %d \n", lux);	
+				 }		
                 }
             }
         }

@@ -29,8 +29,9 @@ struct sec_led_data {
 
 static int led_state =0;
 static int bln_state=0;
+static int too_much_light=0;
 
-static int bl_timeout = 1600;
+static int bl_timeout = 6000;
 static struct timer_list bl_timer;
 static void bl_off(struct work_struct *bl_off_work);
 static DECLARE_WORK(bl_off_work, bl_off);
@@ -57,9 +58,10 @@ static void bl_set_timeout() {
 
 void trigger_touchkey_led(int event)
 {
-	//event: 0-All Lights | 1-Menu Pressed | 2-Back Pressed	| 3- Screen/key Release
+	//event: 0-All Lights | 1-Menu Pressed | 2-Back Pressed	| 3- Screen/key Release | 4- Enough ambient light | 5- Not enough ambient light
 	if(bl_timeout!=0)
 	{
+	    if((too_much_light==0) || ((too_much_light==1) && (event==5)))
 		switch (event)
 		{
 		    case 0 :
@@ -79,11 +81,23 @@ void trigger_touchkey_led(int event)
 			gpio_set_value(OMAP_GPIO_LED_EN2, 1);   //this is here in case of coming from 2
 			bl_set_timeout();                       //Start the count at screen/key release
 		    break;
+		    case 4 :
+   			gpio_set_value(OMAP_GPIO_LED_EN1, 0);
+			gpio_set_value(OMAP_GPIO_LED_EN2, 0);
+			too_much_light=1;
+            led_state = 0;
+            bln_state = 0;
+            printk(KERN_DEBUG "[LED] OFF by lsensor event: %d  \n", event);
+            return;
+		    case 5 :
+		    too_much_light=0;
+		    printk(KERN_DEBUG "[LED] resuming by lsensor event: %d  \n", event);
+		    return;
             default :
         	printk(KERN_DEBUG "[LED] WARNING unknown event: %d  \n", event);
         	return;
 		}
-		led_state = 1;
+   		led_state = 1;
 		bln_state = 0;
 	}
 }
