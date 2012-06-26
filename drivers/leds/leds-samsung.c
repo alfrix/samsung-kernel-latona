@@ -60,7 +60,13 @@ void trigger_touchkey_led(int event)
 {
 	//event: 0-All Lights | 1-Menu Pressed | 2-Back Pressed	| 3- Screen/key Release | 4- Enough ambient light | 5- Not enough ambient light
 	if(bl_timeout!=0)
-	{
+	{	
+	    if((bln_state==1)&&(too_much_light==1)) 
+	    {
+	        gpio_set_value(OMAP_GPIO_LED_EN1, 0);
+	        gpio_set_value(OMAP_GPIO_LED_EN2, 0);
+	    }
+		bln_state = 0;
 	    if((too_much_light==0) || ((too_much_light==1) && (event==5)))
 		switch (event)
 		{
@@ -86,7 +92,6 @@ void trigger_touchkey_led(int event)
 			gpio_set_value(OMAP_GPIO_LED_EN2, 0);
 			too_much_light=1;
             led_state = 0;
-            bln_state = 0;
             printk(KERN_DEBUG "[LED] OFF by lsensor event: %d  \n", event);
             return;
 		    case 5 :
@@ -98,7 +103,6 @@ void trigger_touchkey_led(int event)
         	return;
 		}
    		led_state = 1;
-		bln_state = 0;
 	}
 }
 
