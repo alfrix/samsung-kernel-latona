@@ -23,6 +23,7 @@
 #include "common.h"
 // This is for touchkey led control
 #include <linux/leds.h>
+#include <linux/miscdevice.h>
 /*Light sensor device state, LDO state*/
 #define  NOT_OPERATIONAL    0
 #define  OPERATIONAL        1
@@ -45,6 +46,7 @@
 #define CARKIT_ANA_CTRL     0xBB
 #define SEL_MADC_MCPC       0x08
 
+static int bl_threshold = 200;
 /*
  * lock: mutex to serialize the access to this data structure 
  * t2_vintana2_ldo: res_handle structure for VINTANA 2 LDO in TWL4030
@@ -750,14 +752,17 @@ static void L_dev_work_func (struct work_struct *unused)
                     //L_dev.last_lux_val = lux;
                     L_dev.last_brightness_step = step;
 		     printk(KERN_DEBUG "LSENSOR: %s: adc_val=%d lux = %d \n", __func__, adc_val, lux);
-		     	 if(lux>=200) {
-				 trigger_touchkey_led(4);
-				 printk(KERN_DEBUG "LSENSOR: Turn the leds OFF lux = %d \n", lux);
-				 }
-				 else {
-				 trigger_touchkey_led(5);
-				 printk(KERN_DEBUG "LSENSOR: Release the leds lux = %d \n", lux);	
-				 }		
+		     	 if(bl_threshold!=0)
+		     	 {
+		         	 if(lux>=bl_threshold) {
+				     trigger_touchkey_led(4);
+				     printk(KERN_DEBUG "LSENSOR: Turn the leds OFF lux = %d \n", lux);
+				     }
+				     else {
+				     trigger_touchkey_led(5);
+				     printk(KERN_DEBUG "LSENSOR: Release the leds lux = %d \n", lux);	
+				     }		
+				  }
                 }
             }
         }
@@ -773,6 +778,32 @@ static void L_dev_work_func (struct work_struct *unused)
     trace_out() ;
 }
 
+static ssize_t bl_threshold_read(struct device *dev, struct device_attribute *attr, char *buf) {
+return sprintf(buf,"%d\n", bl_threshold);
+}
+
+static ssize_t bl_threshold_write(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+sscanf(buf, "%d\n", &bl_threshold);
+return size;
+}
+
+static DEVICE_ATTR(bl_threshold, S_IRUGO | S_IWUGO, bl_threshold_read, bl_threshold_write);
+
+
+static struct attribute *bl_led_attributes[] = {
+&dev_attr_bl_threshold.attr,
+NULL
+};
+
+static struct attribute_group bl_led_group = {
+.attrs = bl_led_attributes,
+};
+
+static struct miscdevice bl_led_device = {
+.minor = MISC_DYNAMIC_MINOR,
+.name = "led_sensor_control",
+};
 
 static ssize_t L_delay_show(struct device *dev, struct device_attribute *attr, char *buf);
 static ssize_t L_delay_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count);
@@ -826,6 +857,13 @@ int L_sysfs_init(struct input_dev * input_data)
     int ret = 0;
 
     trace_in();
+    
+	if (misc_register(&bl_led_device))
+        printk("%s misc_register(%s) failed\n", __FUNCTION__, bl_led_device.name);
+    else {
+        if (sysfs_create_group(&bl_led_device.this_device->kobj, &bl_led_group) < 0)
+        pr_err("failed to create sysfs group for device %s\n", bl_led_device.name);
+    }
 
     ret = sysfs_create_group(&input_data->dev.kobj, &L_attribute_group);
     if (ret) {
