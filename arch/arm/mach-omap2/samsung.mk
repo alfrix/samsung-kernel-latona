@@ -36,11 +36,11 @@ endif
 
 export OMAP_SAMSUNG_MUX_FILE_NAME
 
-omap_smasung_mux_cflags = \
+omap_samsung_mux_cflags = \
 	-include $(shell printf "%s/plat/%s.h" $(omap_samsung_plat_inc_path) $(OMAP_SAMSUNG_MUX_FILE_NAME)) \
 	-D$(shell printf "_SAMSUNG_BOARD_NAME=%s" $(CONFIG_SAMSUNG_BOARD_NAME))
 
-cflags-y += $(omap_smasung_mux_cflags)
+cflags-y += $(omap_samsung_mux_cflags)
 KBUILD_CFLAGS += $(cflags-y)
 
 endif
