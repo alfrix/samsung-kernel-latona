@@ -24,6 +24,8 @@
 #include "omap_ion_priv.h"
 
 struct ion_device *omap_ion_device;
+EXPORT_SYMBOL(omap_ion_device);
+
 int num_heaps;
 struct ion_heap **heaps;
 struct ion_heap *tiler_heap;
@@ -147,7 +149,7 @@ int omap_ion_remove(struct platform_device *pdev)
 static struct platform_driver ion_driver = {
 	.probe = omap_ion_probe,
 	.remove = omap_ion_remove,
-	.driver = { .name = "ion-omap4" }
+	.driver = { .name = "ion-omap" }
 };
 
 static int __init ion_init(void)

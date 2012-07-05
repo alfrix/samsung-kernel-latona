@@ -104,6 +104,8 @@ static inline void omap_init_dsp(void) { }
 
 static unsigned long dspbridge_phys_mempool_base;
 
+#include <linux/memblock.h>
+
 void dspbridge_reserve_sdram(void)
 {
 	void *va;
@@ -112,13 +114,9 @@ void dspbridge_reserve_sdram(void)
 	if (!size)
 		return;
 
-	va = __alloc_bootmem_nopanic(size, SZ_1M, 0);
-	if (!va) {
-		pr_err("%s: Failed to bootmem allocation(%lu bytes)\n",
-		       __func__, size);
-		return;
-	}
-	dspbridge_phys_mempool_base = virt_to_phys(va);
+  dspbridge_phys_mempool_base = memblock_alloc(size, PAGE_SIZE);
+  memblock_free(dspbridge_phys_mempool_base, size);
+  memblock_remove(dspbridge_phys_mempool_base, size);
 }
 
 unsigned long dspbridge_get_mempool_base(void)

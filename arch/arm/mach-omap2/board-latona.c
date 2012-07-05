@@ -55,6 +55,8 @@
 
 #include "smartreflex-class1p5.h"
 
+#include <linux/memblock.h>
+#include "omap_ion.h"
 /* TODO: OMAP-Samsung Board-Porting Layer */
 #include <mach/board-latona.h>
 #include <mach/sec_log_buf.h>
@@ -495,7 +497,7 @@ static void __init omap_board_init(void)
 #endif
 	omap_voltage_init_vc(&vc_config);
 #endif
-
+    omap_register_ion();
 	sec_common_init_post();
 }
 
@@ -593,13 +595,24 @@ static int __init latona_opp_init(void)
 }
 device_initcall(latona_opp_init);
 
+static void __init latona_reserve(void)
+{
+       /* do the static reservations first */
+       memblock_remove(PHYS_ADDR_SMC_MEM, PHYS_ADDR_SMC_SIZE);
+
+#ifdef CONFIG_ION_OMAP
+       omap_ion_init();
+#endif
+       omap_reserve();
+}
+
 MACHINE_START(LATONA, "LATONA")
     .phys_io = 0x48000000,
     .io_pg_offst = ((0xfa000000) >> 18) & 0xfffc,
     .boot_params = 0x80000100,
     .fixup = omap_board_fixup,
     .map_io = omap_board_map_io,
-    .reserve        = omap_reserve,
+    .reserve        = latona_reserve,
     .init_irq = omap_board_init_irq,
     .init_machine = omap_board_init,
     .timer = &omap_timer,
