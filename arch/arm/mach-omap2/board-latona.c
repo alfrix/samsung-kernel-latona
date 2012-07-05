@@ -599,6 +599,7 @@ MACHINE_START(LATONA, "LATONA")
     .boot_params = 0x80000100,
     .fixup = omap_board_fixup,
     .map_io = omap_board_map_io,
+    .reserve        = omap_reserve,
     .init_irq = omap_board_init_irq,
     .init_machine = omap_board_init,
     .timer = &omap_timer,
