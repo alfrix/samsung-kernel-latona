@@ -11,7 +11,7 @@ make latona_galaxysl_defconfig
 nice -n 10 make -j4 modules
 
 # Strip modules
-find -name '*.ko' -exec -print $CYANOGENMOD/prebuilt/linux-x86/toolchain/linaro-4.6/bin/arm-eabi-strip --strip-unneeded {} \;
+find -name '*.ko' -print -exec $CYANOGENMOD/prebuilt/linux-x86/toolchain/linaro-4.6/bin/arm-eabi-strip --strip-unneeded {} \;
 
 # Copy modules
 find -name '*.ko' -exec cp -av {} $CYANOGENMOD/device/samsung/galaxysl/modules/ \;
