@@ -505,11 +505,9 @@ static void __init omap_board_fixup(struct machine_desc *desc,
 {
 	mi->bank[0].start = 0x80000000;
 	mi->bank[0].size = 256 * SZ_1M;	/* DDR_CS0 256MB */
-	mi->bank[0].node = 0;
 
 	mi->bank[1].start = 0x90000000;
 	mi->bank[1].size = 256 * SZ_1M;	/* DDR_CS1 256MB */
-	mi->bank[1].node = 0;
 
 	mi->nr_banks = 2;
 }
