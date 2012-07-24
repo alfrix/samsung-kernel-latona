@@ -755,11 +755,11 @@ static void L_dev_work_func (struct work_struct *unused)
 		     	 if(bl_threshold!=0)
 		     	 {
 		         	 if(lux>=bl_threshold) {
-				     trigger_touchkey_led(4);
+				     trigger_touchkey_led(2);
 				     printk(KERN_DEBUG "LSENSOR: Turn the leds OFF lux = %d \n", lux);
 				     }
 				     else {
-				     trigger_touchkey_led(5);
+				     trigger_touchkey_led(3);
 				     printk(KERN_DEBUG "LSENSOR: Release the leds lux = %d \n", lux);	
 				     }		
 				  }

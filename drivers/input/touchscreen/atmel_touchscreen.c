@@ -600,7 +600,7 @@ void keyarray_handler(uint8_t * atmel_msg)
 #endif
 		input_report_key(tsp.inputdevice, 139, DEFAULT_PRESSURE_DOWN);
         	input_sync(tsp.inputdevice);    		
-		trigger_touchkey_led(1);
+		trigger_touchkey_led(0);
 	}
 	else if( (atmel_msg[2] & 0x2) && (back_button==0) ) // back press
 	{
@@ -610,7 +610,7 @@ void keyarray_handler(uint8_t * atmel_msg)
 #endif
 		input_report_key(tsp.inputdevice, 158, DEFAULT_PRESSURE_DOWN);                
         	input_sync(tsp.inputdevice);    				
-		trigger_touchkey_led(2);
+		trigger_touchkey_led(0);
 	}
 	else if( (~atmel_msg[2] & (0x1)) && menu_button==1 ) // menu_release
 	{
@@ -620,7 +620,7 @@ void keyarray_handler(uint8_t * atmel_msg)
 #endif
 		input_report_key(tsp.inputdevice, 139, DEFAULT_PRESSURE_UP);     
         	input_sync(tsp.inputdevice);    				
-		trigger_touchkey_led(3);
+		trigger_touchkey_led(1);
 	}
 	else if( (~atmel_msg[2] & (0x2)) && back_button==1 ) // menu_release
 	{
@@ -630,7 +630,7 @@ void keyarray_handler(uint8_t * atmel_msg)
 #endif
 		input_report_key(tsp.inputdevice, 158, DEFAULT_PRESSURE_UP); 
         	input_sync(tsp.inputdevice);    				
-		trigger_touchkey_led(3);
+		trigger_touchkey_led(1);
 	}
 	else
 	{
@@ -826,7 +826,7 @@ void handle_multi_touch(uint8_t *atmel_msg)
 			else touch_count++;
 		}
 		input_sync(tsp.inputdevice);
-        if(touch_count!=0) trigger_touchkey_led(0); else trigger_touchkey_led(3);
+        if(touch_count!=0) trigger_touchkey_led(0); else trigger_touchkey_led(1);
 #if defined(CONFIG_SAMSUNG_KERNEL_DEBUG_USER)
 		if(prev_touch_count != touch_count) {
 			printk(KERN_DEBUG "[TSP] id[%d],x=%d,y=%d,%dpoint(s)\n", id, x, y, touch_count);

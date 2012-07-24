@@ -31,7 +31,7 @@ static int led_state =0;
 static int bln_state=0;
 static int too_much_light=0;
 
-static int bl_timeout = 6000;
+static int bl_timeout = 16000;
 static struct timer_list bl_timer;
 static void bl_off(struct work_struct *bl_off_work);
 static DECLARE_WORK(bl_off_work, bl_off);
@@ -58,7 +58,7 @@ static void bl_set_timeout() {
 
 void trigger_touchkey_led(int event)
 {
-	//event: 0-All Lights | 1-Menu Pressed | 2-Back Pressed	| 3- Screen/key Release | 4- Enough ambient light | 5- Not enough ambient light
+	//event: 0-All Lights | 1- Screen/key Release | 2- Enough ambient light | 3- Not enough ambient light
 	if(bl_timeout!=0)
 	{	
 	    if((bln_state==1)&&(too_much_light==1)) 
@@ -75,29 +75,19 @@ void trigger_touchkey_led(int event)
 			gpio_set_value(OMAP_GPIO_LED_EN2, 1);
 		    break;
 		    case 1 :
-   			gpio_set_value(OMAP_GPIO_LED_EN1, 0);
-			gpio_set_value(OMAP_GPIO_LED_EN2, 1);
-		    break;
-		    case 2 :
-			gpio_set_value(OMAP_GPIO_LED_EN1, 1);
-			gpio_set_value(OMAP_GPIO_LED_EN2, 0);
-		    break;
-		    case 3 :
-		    gpio_set_value(OMAP_GPIO_LED_EN1, 1);   //this is here in case of coming from 1
-			gpio_set_value(OMAP_GPIO_LED_EN2, 1);   //this is here in case of coming from 2
 			bl_set_timeout();                       //Start the count at screen/key release
 		    break;
-		    case 4 :
+		    case 2 :
    			gpio_set_value(OMAP_GPIO_LED_EN1, 0);
 			gpio_set_value(OMAP_GPIO_LED_EN2, 0);
 			too_much_light=1;
-            led_state = 0;
-            printk(KERN_DEBUG "[LED] OFF by lsensor event: %d  \n", event);
-            return;
-		    case 5 :
-		    too_much_light=0;
-		    printk(KERN_DEBUG "[LED] resuming by lsensor event: %d  \n", event);
-		    return;
+			led_state = 0;
+			printk(KERN_DEBUG "[LED] OFF by lsensor event: %d  \n", event);
+			return;
+		    case 3 :
+			too_much_light=0;
+			printk(KERN_DEBUG "[LED] resuming by lsensor event: %d  \n", event);
+			return;
             default :
         	printk(KERN_DEBUG "[LED] WARNING unknown event: %d  \n", event);
         	return;

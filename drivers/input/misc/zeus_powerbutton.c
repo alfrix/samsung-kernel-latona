@@ -134,7 +134,7 @@ static irqreturn_t powerkey_press_handler(int irq_num, void * dev)
 #if defined(CONFIG_SAMSUNG_KERNEL_DEBUG_USER)
   dev_dbg(ip_dev->dev.parent,"Sent KEY_POWER event = %d\n",key_press_status);
   printk("[PWR-KEY] KEY_POWER event = %d\n",key_press_status);
-  if(key_press_status==1) trigger_touchkey_led(0); else trigger_touchkey_led(3);
+  if(key_press_status==1) trigger_touchkey_led(0); else trigger_touchkey_led(1);
 #endif
 #if defined(CONFIG_INPUT_GPIO_VOLUME_KEY) && defined(CONFIG_SAMSUNG_KERNEL_DEBUG_USER)
   check_force_crash(POWER_KEY_FLAG, key_press_status);
@@ -188,7 +188,7 @@ static irqreturn_t homekey_press_handler(int irq_num, void * dev)
   // "Rearm" home key event timer
   home_key_up_time = current_kernel_time();
   
-  if(home_key_press_status==1) trigger_touchkey_led(0); else trigger_touchkey_led(3);
+  if(home_key_press_status==1) trigger_touchkey_led(0); else trigger_touchkey_led(1);
 #if defined(CONFIG_SAMSUNG_KERNEL_DEBUG_USER)
   dev_dbg(ip_dev->dev.parent,"Sent KEY_HOME event = %d\n",home_key_press_status);
   printk("Sent KEY_HOME event = %d\n",home_key_press_status);
