@@ -31,7 +31,9 @@
 
 pub2sec_bridge_entry:
    .global pub2sec_bridge_entry
-   .arch_extension sec
+#ifdef REQUIRES_SEC
+   ".arch_extension sec\n"
+#endif
 
       PUSH     {R4-R12, LR}
       // Copy the Secure Service ID in R12
