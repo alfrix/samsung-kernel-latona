@@ -268,6 +268,7 @@
 int twl4030_usb_device_connected(void);
 int get_usbic_state(void);
 #define MICROUSBIC_USB_CABLE  1
+#define MICROUSBIC_USB_OTG_CABLE  7
 struct twl4030_usb *t2_transceiver;
 
 EXPORT_SYMBOL(t2_transceiver);
@@ -391,11 +392,20 @@ static enum usb_xceiv_events twl4030_usb_linkstat(struct twl4030_usb *twl)
 {
 #ifdef CONFIG_FSA9480_MICROUSB
 	int	linkstat = USB_EVENT_NONE;
+	int 	usbic_state=get_real_usbic_state();
 
-	if(get_real_usbic_state() == MICROUSBIC_USB_CABLE)
+	if(usbic_state == MICROUSBIC_USB_CABLE)
 //	if(0)
 	{
 		linkstat = USB_EVENT_VBUS;
+	}else if(usbic_state == MICROUSBIC_USB_OTG_CABLE){
+		linkstat = USB_EVENT_ID;
+
+		spin_lock_irq(&twl->lock);
+		twl->linkstat = linkstat;
+		twl->otg.default_a = true;
+		twl->otg.state = OTG_STATE_A_IDLE;
+		spin_unlock_irq(&twl->lock);
 	}
 
 	return linkstat;
@@ -842,9 +852,12 @@ static int twl4030_set_host(struct otg_transceiver *x, struct usb_bus *host)
 int twl4030_usb_device_connected(void)
 {
 #ifdef CONFIG_MICROUSBIC_INTR 
-	return (get_usbic_state()== MICROUSBIC_USB_CABLE);
+	int usbic_state=get_usbic_state();
+	if((usbic_state == MICROUSBIC_USB_CABLE)||(usbic_state == MICROUSBIC_USB_OTG_CABLE))
+		return 1;
+	else
 #endif 
-	return 0;
+		return 0;
 }
 
 int check_device_connected()
@@ -892,6 +905,7 @@ static int __devinit twl4030_usb_probe(struct platform_device *pdev)
 	t2_transceiver = twl;
 	t2_transceiver->link_context_cable = musb_platform_cable_mgr ;
 #endif
+
 	twl->dev		= &pdev->dev;
 	twl->irq		= platform_get_irq(pdev, 0);
 	twl->otg.dev		= twl->dev;

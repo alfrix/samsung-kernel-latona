@@ -291,6 +291,7 @@ typedef enum
 }DRV_CONNECTIVITY_NV_TYPE;
 
 // microusb device id
+#define MICROUSBIC_USB_OTG_CABLE	7
 #define MICROUSBIC_5W_CHARGER		6
 #define MICROUSBIC_JIG_UART_OFF		5
 #define MICROUSBIC_JIG_UART_ON		4

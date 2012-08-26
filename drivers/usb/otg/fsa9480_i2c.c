@@ -459,8 +459,31 @@ static void fsa9480_process_device(u8 dev1, u8 dev2, u8 attach)
 			break;
 
 			case FSA9480_DEV_TY1_USB_OTG:
-				DEBUG_FSA9480("USB OTG ");
-				DEBUG_FSA9480("\n");
+				if(attach & FSA9480_INT1_ATTACH)
+				{
+					DEBUG_FSA9480("FSA9480_DEV_TY1_USB_OTG --- Attach");
+					DEBUG_FSA9480("\n");
+
+					MicroUSBStatus = _ATTACH;
+					usbic_state = MICROUSBIC_USB_OTG_CABLE;
+#ifdef CONFIG_FSA9480_NOTIFY_USB_CONNECTION_STATE
+					fsa9480_notify_connection_state_changed(USB_STATE_CONNECTED);
+#endif
+				}else{
+					DEBUG_FSA9480("FSA9480_DEV_TY1_USB_OTG --- Detach");
+					DEBUG_FSA9480("\n");
+
+					MicroUSBStatus = _DETTACH;
+					usbic_state = MICROUSBIC_NO_DEVICE;
+#ifdef CONFIG_FSA9480_NOTIFY_USB_CONNECTION_STATE
+					fsa9480_notify_connection_state_changed(USB_STATE_DISCONNECTED);
+#endif
+					interruptible_sleep_on_timeout(&usb_disconnect_waitq, USB_DISCONNECT_WAIT_TIMEOUT);
+				}
+
+				wake_up_interruptible(&usb_detect_waitq);
+				microusb_usbjig_detect();
+
 			break;
 
 			default:
@@ -976,6 +999,10 @@ int get_real_usbic_state(void)
 
 		case FSA9480_DEV_TY1_DED_CHG:
 		ret = MICROUSBIC_TA_CHARGER;
+		break;
+
+		case FSA9480_DEV_TY1_USB_OTG:
+		ret = MICROUSBIC_USB_OTG_CABLE;
 		break;
 
 		default:
