@@ -1092,6 +1092,7 @@ wake_lock_timeout(&uart_lock, 2*HZ);
 static struct omap_onenand_platform_data board_onenand_data = {
 	.cs		= 0,
 	.gpio_irq	= 73,
+	.dma_channel	= -1,
 	.parts		= onenand_partitions,
 	.nr_parts	= ARRAY_SIZE(onenand_partitions),
 	.flags		= ONENAND_SYNC_READWRITE,
